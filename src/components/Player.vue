@@ -24,7 +24,6 @@
                 <use xlink:href="#icon-xiayishou"></use>
               </svg>
             </div>
-            <script src="play-action.js"></script>
           </div>
           <div class="right">
             <div class="tagName">流行</div>
@@ -86,6 +85,6 @@
   }
 </script>
 
-<style scoped lang="scss">
+<style scoped >
 
 </style>
