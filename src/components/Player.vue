@@ -6,29 +6,32 @@
           <div class="left">
             <h1>晴天</h1>
             <h2>周杰伦</h2>
-            <figure></figure>
+            <figure ref="figure"></figure>
             <div class="action">
-              <svg class="icon" aria-hidden="true">
+              <svg class="icon" aria-hidden="true" v-if="!isRecycle">
                 <use xlink:href="#icon-xunhuanbofang"></use>
               </svg>
-              <svg class="icon hidden" aria-hidden="true">
+              <svg class="icon " aria-hidden="true" v-if="isRecycle">
                 <use xlink:href="#icon-xunhuanjiagongcishu"></use>
               </svg>
-              <svg class="icon " aria-hidden="true">
+              <svg class="icon " aria-hidden="true" v-if="!isPlaying"
+              @click="playSong">
                 <use xlink:href="#icon-bofang"></use>
               </svg>
-              <svg class="icon hidden" aria-hidden="true">
+              <svg class="icon " aria-hidden="true" v-if="isPlaying"
+              @click="pauseSong"
+              >
                 <use xlink:href="#icon-zantingtingzhi"></use>
               </svg>
-              <svg class="icon" aria-hidden="true">
+              <svg class="icon" aria-hidden="true" @click="nextSong">
                 <use xlink:href="#icon-xiayishou"></use>
               </svg>
             </div>
           </div>
           <div class="right">
-            <div class="tagName">流行</div>
-            <h1>晴天</h1>
-            <h2>周杰伦</h2>
+            <div class="tagName">{{currentChannnelName}}</div>
+            <h1>{{(currentSong)?currentSong.title:'七里香'}}</h1>
+            <h2>{{(currentSong)?currentSong.artist:'周杰伦'}}</h2>
             <div class="lyrics-wrapper">
               <div class="lyrics">
                 <p>周杰伦</p>
@@ -64,8 +67,14 @@
           <use xlink:href="#icon-arrow-left"></use>
         </svg>
         <div class="channel-wrapper">
-          <div class="channels ">
-          </div>
+          <ul class="channels ">
+            <li class="channel" v-for="value in channelList" :key="value.channel_id"
+            @click="selectChannel(value.channel_id,value.name)"
+            >
+              <img :src="value.cover_small" alt="">
+              <h3 class="title">{{value.name}}</h3>
+            </li>
+          </ul>
         </div>
         <svg class="icon arrow-right" aria-hidden="true">
           <use xlink:href="#icon-arrow-right"></use>
@@ -80,8 +89,65 @@
 </template>
 
 <script>
+  import '../assets/svg'
+  import axios from 'axios'
   export default {
-    name: "Player"
+    name: "Player",
+    data(){
+      return{
+        channelList:null,
+        currentChannnel:'',
+        currentChannnelName:'',
+        currentSong:null,
+        audio:new Audio(),
+        isPlaying:false,
+        isRecycle:false,
+      }
+    },
+    created() {
+      axios.get('//jirenguapi.applinzi.com/fm/getChannels.php')
+        .then((res)=>{
+          this.channelList=res.data.channels
+        })
+    },
+    computed:{
+      title(){
+        return
+      }
+    },
+    methods:{
+      selectChannel(id,name){
+        this.currentChannnel=id
+        this.currentChannnelName=name
+
+        axios.get('//jirenguapi.applinzi.com/fm/getSong.php',{channnel:id})
+          .then((res)=>{
+            this.currentSong=res.data.song[0]
+            console.log(this.currentSong);
+            this.setCurrentSong()
+          })
+      },
+      setCurrentSong(){
+        this.audio.src=this.currentSong.url
+        this.$refs.figure.style.backgroundImage=`url(${this.currentSong.picture})`
+      },
+      nextSong(){
+        axios.get('//jirenguapi.applinzi.com/fm/getSong.php',{channnel:this.currentChannnel})
+          .then((res)=>{
+            this.currentSong=res.data.song[0]
+            console.log(this.currentSong);
+            this.setCurrentSong()
+          })
+      },
+      playSong(){
+        this.isPlaying=true
+        this.audio.play()
+      },
+      pauseSong(){
+        this.isPlaying=false
+        this.audio.pause()
+      }
+    }
   }
 </script>
 
