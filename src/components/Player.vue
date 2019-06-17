@@ -63,11 +63,11 @@
         </div>
       </main>
       <footer>
-        <svg class="icon arrow-left" aria-hidden="true">
+        <svg class="icon arrow-left" aria-hidden="true" @click="leftList">
           <use xlink:href="#icon-arrow-left"></use>
         </svg>
         <div class="channel-wrapper">
-          <ul class="channels ">
+          <ul class="channels " ref="channels">
             <li class="channel" v-for="value in channelList" :key="value.channel_id"
             @click="selectChannel(value.channel_id,value.name)"
             >
@@ -76,7 +76,7 @@
             </li>
           </ul>
         </div>
-        <svg class="icon arrow-right" aria-hidden="true">
+        <svg class="icon arrow-right" aria-hidden="true" @click="rightList">
           <use xlink:href="#icon-arrow-right"></use>
         </svg>
 
@@ -102,25 +102,29 @@
         audio:new Audio(),
         isPlaying:false,
         isRecycle:false,
+        initScroll:0
       }
     },
     created() {
       axios.get('//jirenguapi.applinzi.com/fm/getChannels.php')
         .then((res)=>{
           this.channelList=res.data.channels
+          console.log(res.data.channels);
         })
     },
     computed:{
-      title(){
-        return
+      listWidth(){
+        let {width}= this.$refs.channels.getBoundingClientRect()
+        return width
       }
     },
     methods:{
       selectChannel(id,name){
+        console.log(id);
         this.currentChannnel=id
         this.currentChannnelName=name
 
-        axios.get('//jirenguapi.applinzi.com/fm/getSong.php',{channnel:id})
+        axios.get(`//jirenguapi.applinzi.com/fm/getSong.php?channel=${id}`)
           .then((res)=>{
             this.currentSong=res.data.song[0]
             console.log(this.currentSong);
@@ -132,7 +136,7 @@
         this.$refs.figure.style.backgroundImage=`url(${this.currentSong.picture})`
       },
       nextSong(){
-        axios.get('//jirenguapi.applinzi.com/fm/getSong.php',{channnel:this.currentChannnel})
+        axios.get(`//jirenguapi.applinzi.com/fm/getSong.php?channel=${this.currentChannnel}`)
           .then((res)=>{
             this.currentSong=res.data.song[0]
             console.log(this.currentSong);
@@ -142,10 +146,21 @@
       playSong(){
         this.isPlaying=true
         this.audio.play()
+        this.audio.autoplay=true
       },
       pauseSong(){
         this.isPlaying=false
         this.audio.pause()
+      },
+      leftList(){
+        this.initScroll-=1
+        if(this.initScroll<0){this.initScroll=0}
+        this.$refs.channels.style.transform=`translateX(-${50 * this.initScroll}%)`
+      },
+      rightList(){
+        this.initScroll+=1
+        if(this.initScroll>19){this.initScroll=19}
+        this.$refs.channels.style.transform=`translateX(-${50 * this.initScroll}%)`
       }
     }
   }
