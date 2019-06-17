@@ -231,14 +231,25 @@ main .progress {
 main .progress .progressBar {
     background-color: rgba(255, 255, 255, 0.4);
     width: 90%;
-    height: 0.8vh;
+    height: 8px;
     border-radius: 3px;
+    positon:relative;
+}
+
+main .progress .progressBar .circle{
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 20px;
+  height: 20px;
+  border: 1px solid gray;
+  border-radius: 50%;
+  position: absolute;
+  transform: translate(-50%,calc(-50% - 4px));
 }
 
 main .progress .progressBar .currentBar {
     background-color: rgba(255, 255, 255, 1);
     width: 0%;
-    height: 0.8vh;
+    height: 8px;
     border-radius: 3px;
 }
 
