@@ -75,7 +75,7 @@
                 @click="selectChannel(value.channel_id,value.name)"
             >
               <img :src="value.cover_small" alt="">
-              <h3 class="title">-{{value.name}}</h3>
+              <h3 class="title">{{value.name}}</h3>
             </li>
           </ul>
         </div>
@@ -240,6 +240,6 @@
   }
 </script>
 
-<style scoped>
+<style scoped src="../assets/style.css">
 
 </style>
